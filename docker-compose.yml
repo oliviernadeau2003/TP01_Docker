@@ -20,6 +20,19 @@ services:
   mariadb:
     image: mariadb
     container_name: mariadb
+    ports:
+      - 3307:3307
+    restart: always
+    networks:
+      - reseauWP
+    volumes:
+      - ./bdwp:/var/lib/mysql
+    environment:
+      - MARIADB_USER=${MYSQL_USER}
+      - MARIADB_PASSWORD=${MYSQL_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MYSQL_DATABASE}
+
   # <-------------------------------------- FIN
 
   # ==============================================
@@ -28,8 +41,13 @@ services:
   # # Service disponible sur le port 80
   # ==============================================
   nginx:
-    image: nginx
+    image: nginx-perso
     container_name: nginx
+    networks:
+      - reseauWP
+    ports:
+      - 80:80
+
   # <-------------------------------------- FIN
 
 
@@ -38,14 +56,28 @@ services:
   # Construction et démarrage de WordPress
   # Service disponible sur le port 88
   # ===========================================
-
   # Exemple d'utilisation des variables du fichier .env
   #    environment:
   #      - WORDPRESS_DB_HOST=${WP_HOST}
   #      - WORDPRESS_DB_USER=${WP_USER}
   #      - WORDPRESS_DB_PASSWORD=${WP_PASSWORD}
   #      - WORDPRESS_DB_NAME=${WP_DB_NAME}
-
+  wordpress:
+    image: wordpress-perso
+    container_name: wordpress
+    restart: always
+    networks:
+      - reseauWP
+    ports:
+      - 88:80
+    depends_on:
+      - mariadb
+    environment:
+      - WORDPRESS_DB_HOST=${WP_HOST}
+      - WORDPRESS_DB_USER=${WP_USER}
+      - WORDPRESS_DB_PASSWORD=${WP_PASSWORD}
+      - WORDPRESS_DB_NAME=${WP_DB_NAME}
+      - WORDPRESS_TABLE_PREFIX=${WP_TABLE_PREFIX}
 
   # <-------------------------------------- FIN
 
@@ -105,15 +137,22 @@ services:
     # Service disponible sur le port 82
     # ===========================================
     # NOTE: Il ne faut pas utiliser la méthode: PMA_ARBITRARY=1
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    networks:
+      - reseauWP
+    ports:
+      - 82:80
+    depends_on:
+      - mariadb
+      # <-------------------------------------- FIN
 
 
-    # <-------------------------------------- FIN
-
-
-
-    # ===========================================
-    # Les réseaux de l'application
-    # ===========================================
+      # ===========================================
+      # Les réseaux de l'application
+      # ===========================================
 networks:
   reseauWP:
     name: reseauWP
