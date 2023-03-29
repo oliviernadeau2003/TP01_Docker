@@ -21,17 +21,17 @@ services:
     image: mariadb
     container_name: mariadb
     ports:
-      - 3307:3307
+      - 3307:3306
     restart: always
     networks:
       - reseauWP
     volumes:
       - ./bdwp:/var/lib/mysql
     environment:
-      - MARIADB_USER=${MYSQL_USER}
-      - MARIADB_PASSWORD=${MYSQL_PASSWORD}
-      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MARIADB_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
 
   # <-------------------------------------- FIN
 
@@ -88,15 +88,36 @@ services:
   # Le serveur d'activités percona PMM
   # Service disponible sur le port 83
   # ===========================================
+  percona-ppm:
+    image: percona/pmm-server
+    container_name: percona-ppm
+    restart: always
+    networks:
+      - reseauPMM
+    ports:
+      - 83:80
+    environment:
+      - SERVER_USER=${PMM_USER}
+      - SERVER_PASSWORD=${PMM_PASS}
+    volumes_from:
+      - pmm-data
+        # <-------------------------------------- FIN
 
-
-  # <-------------------------------------- FIN
-
-  # ===========================================
-  # Le serveur de base de données postgres
-  # Service disponible sur le port 5432
-  # ===========================================
-
+        # ===========================================
+        # Le serveur de base de données postgres
+        # Service disponible sur le port 5432
+        # ===========================================
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    networks:
+      - reseauPMM
+    ports:
+      - 5432:80
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
   # <-------------------------------------- FIN
 
