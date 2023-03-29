@@ -1,0 +1,33 @@
+
+reseauWP:
+	- nginx
+		- port 80
+		-> dossier : contenu-web
+		
+	- mariaDB
+		- port TCP:3307
+		sauvegarde locale -> bdwp
+		
+	- wordpress
+		- port 88
+		style : https://wordpress.org/themes/simple-style/
+		plugin: https://wordpress.org/plugins/code-prettify/
+		dbprefix "wp_" -> "2148279_"
+		dépendance : mariaDB
+		
+	- phpmyadmin
+		- port 82
+		dépendance : mariaDB
+
+		
+reseauPMM:
+	- postgreSQL
+		- port TCP:5432
+		
+	- percona PMM client
+		- port 83
+		dépendance : postgres, pmm-server
+		
+	- postgresAdmin
+		- port 81
+		dépendance : postregres
